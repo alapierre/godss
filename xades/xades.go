@@ -29,29 +29,24 @@ type xades struct {
 	signer signer.Signer
 }
 
+func NewDefault(signer signer.Signer) Xades {
+	return &xades{
+		config: Config{
+			Canonicalizer: MakeC14N10ExclusiveCanonicalizerWithPrefixList(""),
+			IsEnveloped:   true,
+			Hash:          crypto.SHA256,
+			ReferenceURI:  "",
+			SigningTime:   time.Time{},
+		},
+		signer: signer,
+	}
+}
+
 func New(config Config, signer signer.Signer) Xades {
 	return &xades{
 		config: config,
 		signer: signer,
 	}
-}
-
-func printXml(el *etree.Element) {
-	doc := etree.NewDocument()
-	doc.SetRoot(el.Copy())
-
-	//doc.WriteSettings = etree.WriteSettings{
-	//	CanonicalAttrVal: true,
-	//	CanonicalEndTags: false,
-	//	CanonicalText:    true,
-	//}
-
-	s, err := doc.WriteToString()
-	if err != nil {
-		fmt.Printf("failed to serialize XML: %v", err)
-	}
-
-	fmt.Printf("`%s`\n", s)
 }
 
 // CreateSignature create filled signature element
@@ -63,7 +58,6 @@ func (x *xades) CreateSignature(signedData *etree.Element) (*etree.Element, erro
 		return nil, err
 	}
 
-	printXml(signedData)
 	fmt.Printf("DigestData: %s\n", digestData)
 
 	if x.config.SigningTime.IsZero() {
@@ -106,7 +100,11 @@ func (x *xades) CreateSignature(signedData *etree.Element) (*etree.Element, erro
 		},
 		Child: []etree.Token{signedInfo, signatureValue, keyInfo, object},
 	}
-	return &signature, nil
+
+	res := signedData.Copy()
+	res.AddChild(signature.Copy())
+
+	return res, nil
 }
 
 // DigestValue calculate hash for digest

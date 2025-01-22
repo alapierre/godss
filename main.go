@@ -2,48 +2,55 @@ package main
 
 import (
 	"fmt"
-	"github.com/alapierre/godss/goxades"
+	"github.com/alapierre/godss/signer"
+	"github.com/alapierre/godss/xades"
 	"github.com/beevik/etree"
 	"os"
+	"strings"
 )
 
 // Example usage
 func main() {
-	config := goxades.Config{
-		PKCS11ModulePath: "/opt/proCertumSmartSign/libcryptoCertum3PKCS.so",
-		Pin:              os.Getenv("PIN"),
+
+	pin := os.Getenv("PIN")
+	if pin == "" {
+		panic("PIN envirnoment variable is not set")
+	}
+
+	sig, err := signer.NewPkcs11Signer(signer.Pkcs11Config{
+		Pkcs11ModulePath: "/opt/proCertumSmartSign/libcryptoCertum3PKCS.so",
+		Pin:              pin,
 		SlotNumber:       0,
-		XMLToSign:        `<YourXMLDocument id="signedData"></YourXMLDocument>`,
-	}
+	})
 
-	if config.Pin == "" {
-		panic("PIN environment variable is not set")
-	}
-
-	signer, err := goxades.NewSigner(config)
 	if err != nil {
-		fmt.Printf("Error creating signer: %v\n", err)
-		os.Exit(1)
+		panic(err)
 	}
-	defer signer.Close()
 
-	signedXML, err := signer.SignXML()
+	defer sig.Close()
+
+	x := xades.NewDefault(sig)
+	var sampleXml = `<invoice><Number>12345</Number></invoice>`
+
+	doc := etree.NewDocument()
+	err = doc.ReadFromString(strings.ReplaceAll(sampleXml, "\n", ""))
 	if err != nil {
-		fmt.Printf("Error signing XML: %v\n", err)
-		os.Exit(1)
+		panic(err)
 	}
 
-	fmt.Printf("Signed XML: %s\n", signedXML)
+	signature, err := x.CreateSignature(doc.Root())
+	if err != nil {
+		panic(err)
+	}
 
 	signedDoc := etree.NewDocument()
-	signedDoc.SetRoot(signedXML)
+	signedDoc.SetRoot(signature)
+	signedXML, err := signedDoc.WriteToString()
 
-	res, err := signedDoc.WriteToString()
 	if err != nil {
-		fmt.Printf("failed to serialize signed XML: %v", err)
-		os.Exit(1)
+		panic(err)
 	}
 
-	fmt.Printf("Signed XML: %s\n", res)
+	fmt.Printf("%s\n", signedXML)
 
 }

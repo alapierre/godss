@@ -1,7 +1,6 @@
 package xades
 
 import (
-	"fmt"
 	"github.com/beevik/etree"
 	"github.com/russellhaering/goxmldsig/etreeutils"
 )
@@ -28,7 +27,6 @@ func (c *c14N10ExclusiveCanonicalizer) Canonicalize(el *etree.Element) ([]byte, 
 	if err != nil {
 		return nil, err
 	}
-	fmt.Printf("canonical c14n: %s\n", el.Text())
 	return canonicalSerialize(el)
 }
 
