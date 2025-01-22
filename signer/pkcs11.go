@@ -4,7 +4,6 @@ import (
 	"crypto"
 	"crypto/rsa"
 	"crypto/x509"
-	"encoding/base64"
 	"errors"
 	"fmt"
 	"github.com/miekg/pkcs11"
@@ -52,18 +51,12 @@ func NewPkcs11Signer(config Pkcs11Config) (Signer, error) {
 	return sig, nil
 }
 
+// SignBytes signs the given message using the private key and returns the signature or an error if signing fails.
 func (s *pkcs11signer) SignBytes(message []byte) ([]byte, error) {
-	hash := s.hash.New()
-	if ln, err := hash.Write(message); err != nil {
-		return nil, fmt.Errorf("error calculating hash: %v", err)
-	} else if ln < 1 {
-		return nil, fmt.Errorf("zero length hash")
-	}
-	digest := hash.Sum(nil)
-	fmt.Printf("digest: %s\n", base64.StdEncoding.EncodeToString(digest))
-	return s.signDigest(digest)
+	return s.sign(message)
 }
 
+// SignString converts the input string to bytes and signs it using SignBytes, returning the signature or an error.
 func (s *pkcs11signer) SignString(message string) ([]byte, error) {
 	return s.SignBytes([]byte(message))
 }
@@ -72,7 +65,8 @@ func (s *pkcs11signer) GetCerts() ([][]byte, error) {
 	return s.certChain, nil
 }
 
-func (s *pkcs11signer) signDigest(digest []byte) ([]byte, error) {
+// sign signs the given message using the PKCS#11 private key and returns the resulting signature or an error.
+func (s *pkcs11signer) sign(message []byte) ([]byte, error) {
 
 	err := s.pkcs.SignInit(*s.session, []*pkcs11.Mechanism{
 		pkcs11.NewMechanism(pkcs11.CKM_SHA256_RSA_PKCS, nil),
@@ -81,7 +75,7 @@ func (s *pkcs11signer) signDigest(digest []byte) ([]byte, error) {
 		return nil, fmt.Errorf("failed to initialize signing: %v", err)
 	}
 
-	signature, err := s.pkcs.Sign(*s.session, digest)
+	signature, err := s.pkcs.Sign(*s.session, message)
 	if err != nil {
 		return nil, fmt.Errorf("failed to sign: %v", err)
 	}
@@ -128,10 +122,6 @@ func (s *pkcs11signer) cardInit() error {
 	}
 
 	s.session = &session
-
-	//if err := s.pkcs.Login(session, pkcs11.CKU_USER, s.config.Pin); err != nil {
-	//	return fmt.Errorf("failed to login: %v", err)
-	//}
 
 	if err := s.pkcs.Login(*s.session, pkcs11.CKU_USER, s.config.Pin); err != nil {
 		return fmt.Errorf("failed to login: %v", err)
