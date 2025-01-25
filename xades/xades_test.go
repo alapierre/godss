@@ -12,9 +12,10 @@ import (
 )
 
 func TestSign(t *testing.T) {
+
 	pin := os.Getenv("PIN")
 	if pin == "" {
-		t.Errorf("PIN envirnoment variable is not set")
+		t.Skip("Pomijanie testu: brak PIN do karty inteligentnej (zmienna środowiskowa PIN nie jest ustawiona)")
 	}
 
 	sig, err := signer.NewPkcs11Signer(signer.Pkcs11Config{
