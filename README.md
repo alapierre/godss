@@ -3,7 +3,7 @@ First comprehensive solution in Go for creating XAdES-compliant XML signatures u
 
 [![GoDoc](https://godoc.org/github.com/alapierre/godss?status.svg)](https://godoc.org/github.com/alapierre/godss)
 [![Sonarcloud Status](https://sonarcloud.io/api/project_badges/measure?project=alapierre_godss&metric=alert_status)](https://sonarcloud.io/dashboard?id=alapierre_godss)
-![Build Status](https://github.com/alapierre/godss/actions/workflows/go.yml/badge.svg?branch=main)
+[![Build Status](https://github.com/alapierre/godss/actions/workflows/go.yml/badge.svg?branch=main)](https://github.com/alapierre/godss/actions/workflows/go.yml)
 
 # Usage
 
@@ -64,6 +64,26 @@ func main() {
 	fmt.Printf("%s\n", signedXML)
 
 }
+````
+
+## Generating test sign certyficate
+
+````shell
+openssl req -x509 -newkey rsa:4096 -keyout private_key.pem -out certificate.pem -days 365 -nodes
+````
+
+or:
+
+````shell
+openssl genpkey -algorithm RSA -out private_key.pem -pkeyopt rsa_keygen_bits:3072
+openssl req -new -key private_key.pem -out cert_request.csr
+openssl x509 -req -in cert_request.csr -signkey private_key.pem -out certificate.pem -days 365
+````
+
+optionally you can pack it in .p12 file:
+
+````shell
+openssl pkcs12 -export -inkey private_key.pem -in certificate.pem -out certificate.p12 -name "My Certificate"
 ````
 
 ## Acknowledgments

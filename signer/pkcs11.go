@@ -87,7 +87,7 @@ func (s *pkcs11signer) Public() crypto.PublicKey {
 }
 
 func (s *pkcs11signer) Sign(_ io.Reader, digest []byte, _ crypto.SignerOpts) (signature []byte, err error) {
-	return s.SignBytes(digest)
+	return s.SignBytes(digest) // TODO: it will not works correctly, because SignBytes takes message not hash
 }
 
 func (s *pkcs11signer) Close() error {
