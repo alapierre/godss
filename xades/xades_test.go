@@ -11,6 +11,50 @@ import (
 	"time"
 )
 
+func TestKeyStoreSign(t *testing.T) {
+
+	signer, err := signer.NewX509KeyStoreSigner("../test_data/private_key.pem", "../test_data/certificate.pem")
+
+	if err != nil {
+		t.Error(err)
+	}
+
+	if err != nil {
+		t.Error(err)
+	}
+
+	x := New(Config{
+		Canonicalizer: MakeC14N10ExclusiveCanonicalizerWithPrefixList(""),
+		IsEnveloped:   true,
+		Hash:          crypto.SHA256,
+		ReferenceURI:  "",
+		SigningTime:   time.Time{},
+	}, signer)
+
+	var sampleXml = `<invoice><Number>12345</Number></invoice>`
+
+	doc := etree.NewDocument()
+	err = doc.ReadFromString(strings.ReplaceAll(sampleXml, "\n", ""))
+	if err != nil {
+		t.Error(err)
+	}
+
+	root := removeComments(doc.Root())
+	c, _ := canonicalSerialize(root)
+	fmt.Printf("source: %s\n", c)
+
+	signature, err := x.CreateSignature(root)
+	if err != nil {
+		t.Error(err)
+	}
+
+	b, err := canonicalSerialize(signature)
+	if err != nil {
+		fmt.Printf("%v\n", err.Error())
+	}
+	fmt.Println(string(b))
+}
+
 func TestSign(t *testing.T) {
 
 	pin := os.Getenv("PIN")
