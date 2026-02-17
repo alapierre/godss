@@ -1,2 +1,10 @@
 .idea
 *.iml
+/private.env
+/signed.xml
+/cmd/godss/godss
+/test_data/auth-cert.crt
+/test_data/auth-cert.key
+/test_data/certificate.pem
+/test_data/private_key.pem
+/test_data/authv2_20260216072211.signed.xml

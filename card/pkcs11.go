@@ -1,4 +1,4 @@
-package signer
+package card
 
 import (
 	"crypto"
@@ -6,10 +6,12 @@ import (
 	"crypto/x509"
 	"errors"
 	"fmt"
-	"github.com/miekg/pkcs11"
 	"io"
 	"math/big"
 	"os"
+
+	"github.com/alapierre/godss/signer"
+	"github.com/miekg/pkcs11"
 )
 
 type Pkcs11Config struct {
@@ -28,7 +30,7 @@ type pkcs11signer struct {
 	certChain  [][]byte
 }
 
-func NewPkcs11Signer(config Pkcs11Config) (Signer, error) {
+func NewPkcs11Signer(config Pkcs11Config) (signer.Signer, error) {
 	ctx := pkcs11.New(config.Pkcs11ModulePath)
 	if err := ctx.Initialize(); err != nil {
 		return nil, fmt.Errorf("failed to initialize pkcs11: %v", err)
@@ -87,7 +89,7 @@ func (s *pkcs11signer) Public() crypto.PublicKey {
 }
 
 func (s *pkcs11signer) Sign(_ io.Reader, digest []byte, _ crypto.SignerOpts) (signature []byte, err error) {
-	return s.SignBytes(digest) // TODO: it will not works correctly, because SignBytes takes message not hash
+	return s.SignBytes(digest) // TODO: SignBytes takes message not hash - it can be confused
 }
 
 func (s *pkcs11signer) Close() error {

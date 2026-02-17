@@ -1,4 +1,4 @@
-package signer
+package card
 
 import (
 	"crypto"
@@ -13,7 +13,7 @@ import (
 
 func TestSign(t *testing.T) {
 
-	pin := os.Getenv("PIN")
+	pin := os.Getenv("SIG_PIN")
 	if pin == "" {
 		t.Skip("Pomijanie testu: brak PIN do karty inteligentnej (zmienna środowiskowa PIN nie jest ustawiona)")
 	}

@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<AuthTokenRequest xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns="http://ksef.mf.gov.pl/auth/token/2.0">
+  <Challenge>20260216-CR-15DE925000-F029FF5D64-55</Challenge>
+  <ContextIdentifier>
+    <Nip>1111111111</Nip>
+  </ContextIdentifier>
+  <SubjectIdentifierType>certificateSubject</SubjectIdentifierType>
+  <AuthorizationPolicy>
+    <AllowedIps>
+      <Ip4Address>194.15.123.99</Ip4Address>
+    </AllowedIps>
+  </AuthorizationPolicy>
+</AuthTokenRequest>

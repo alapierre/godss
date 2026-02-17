@@ -3,17 +3,19 @@ package xades
 import (
 	"crypto"
 	"fmt"
-	"github.com/alapierre/godss/signer"
-	"github.com/beevik/etree"
 	"os"
 	"strings"
 	"testing"
 	"time"
+
+	"github.com/alapierre/godss/card"
+	"github.com/alapierre/godss/keystore"
+	"github.com/beevik/etree"
 )
 
 func TestKeyStoreSign(t *testing.T) {
 
-	signer, err := signer.NewX509KeyStoreSigner("../test_data/private_key.pem", "../test_data/certificate.pem")
+	signer, err := keystore.NewX509KeyStoreSigner("../test_data/private_key.pem", "../test_data/certificate.pem")
 
 	if err != nil {
 		t.Error(err)
@@ -43,26 +45,23 @@ func TestKeyStoreSign(t *testing.T) {
 	c, _ := canonicalSerialize(root)
 	fmt.Printf("source: %s\n", c)
 
-	signature, err := x.CreateSignature(root)
+	signature, err := x.SignDocument(root)
 	if err != nil {
 		t.Error(err)
 	}
 
-	b, err := canonicalSerialize(signature)
-	if err != nil {
-		fmt.Printf("%v\n", err.Error())
-	}
-	fmt.Println(string(b))
+	str, err := signature.WriteToString()
+	fmt.Println(str)
 }
 
 func TestSign(t *testing.T) {
 
-	pin := os.Getenv("PIN")
+	pin := os.Getenv("SIG_PIN")
 	if pin == "" {
 		t.Skip("Pomijanie testu: brak PIN do karty inteligentnej (zmienna środowiskowa PIN nie jest ustawiona)")
 	}
 
-	sig, err := signer.NewPkcs11Signer(signer.Pkcs11Config{
+	sig, err := card.NewPkcs11Signer(card.Pkcs11Config{
 		Pkcs11ModulePath: "/opt/proCertumSmartSign/libcryptoCertum3PKCS.so",
 		Pin:              pin,
 		SlotNumber:       0,
@@ -94,40 +93,13 @@ func TestSign(t *testing.T) {
 	c, _ := canonicalSerialize(root)
 	fmt.Printf("source: %s\n", c)
 
-	signature, err := x.CreateSignature(root)
+	signature, err := x.SignDocument(root)
 	if err != nil {
 		t.Error(err)
 	}
 
-	//ret := doc.Root().Copy()
-	//ret.Child = append(ret.Child, signedXML)
-	//
-	//signedDoc := etree.NewDocument()
-	//signedDoc.SetRoot(ret)
-
-	//res, err := signedDoc.WriteToString()
-	//if err != nil {
-	//	fmt.Printf("failed to serialize signed XML: %v", err)
-	//	t.Error(err)
-	//}
-
-	//signedDoc := etree.NewDocument()
-	//signedDoc.SetRoot(signedXML)
-	//
-	//res, err := signedDoc.WriteToString()
-	//if err != nil {
-	//	fmt.Printf("failed to serialize signed XML: %v", err)
-	//	os.Exit(1)
-	//}
-	//
-	//fmt.Printf("Signed XML: %s\n", res)
-
-	b, err := canonicalSerialize(signature)
-	if err != nil {
-		fmt.Printf("%v\n", err.Error())
-	}
-	fmt.Println(string(b))
-
+	str, err := signature.WriteToString()
+	fmt.Println(str)
 }
 
 func removeComments(elem *etree.Element) *etree.Element {

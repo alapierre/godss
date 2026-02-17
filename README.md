@@ -5,33 +5,25 @@ First comprehensive solution in Go for creating XAdES-compliant XML signatures u
 [![Sonarcloud Status](https://sonarcloud.io/api/project_badges/measure?project=alapierre_godss&metric=alert_status)](https://sonarcloud.io/dashboard?id=alapierre_godss)
 [![Build Status](https://github.com/alapierre/godss/actions/workflows/go.yml/badge.svg?branch=main)](https://github.com/alapierre/godss/actions/workflows/go.yml)
 
-# Usage
+## Usage
 
 ````go
 package main
 
 import (
 	"fmt"
-	"github.com/alapierre/godss/signer"
-	"github.com/alapierre/godss/xades"
-	"github.com/beevik/etree"
 	"os"
-	"strings"
+
+	"github.com/alapierre/godss/keystore"
+	"github.com/alapierre/godss/xades"
 )
 
-// Example usage
 func main() {
+	privateKeyPath := "test_data/private_key.pem"
+	certPath := "test_data/certificate.pem"
+	xml := []byte(`<invoice><Number>12345</Number></invoice>`)
 
-	pin := os.Getenv("PIN")
-	if pin == "" {
-		panic("PIN envirnoment variable is not set")
-	}
-
-	sig, err := signer.NewPkcs11Signer(signer.Pkcs11Config{
-		Pkcs11ModulePath: "/opt/proCertumSmartSign/libcryptoCertum3PKCS.so",
-		Pin:              pin,
-		SlotNumber:       0,
-	})
+	sig, err := keystore.NewX509KeyStoreSigner(privateKeyPath, certPath)
 
 	if err != nil {
 		panic(err)
@@ -40,31 +32,29 @@ func main() {
 	defer sig.Close()
 
 	x := xades.NewDefault(sig)
-	var sampleXml = `<invoice><Number>12345</Number></invoice>`
 
-	doc := etree.NewDocument()
-	err = doc.ReadFromString(strings.ReplaceAll(sampleXml, "\n", ""))
+	signedXML, err := x.SignBytes(xml)
 	if err != nil {
 		panic(err)
 	}
 
-	signature, err := x.CreateSignature(doc.Root())
-	if err != nil {
-		panic(err)
-	}
-
-	signedDoc := etree.NewDocument()
-	signedDoc.SetRoot(signature)
-	signedXML, err := signedDoc.WriteToString()
-
-	if err != nil {
-		panic(err)
-	}
-
-	fmt.Printf("%s\n", signedXML)
-
+	fmt.Println(string(signedXML))
 }
 ````
+
+Check `cmd/godss/main.go` for an example
+
+## CLI
+
+```shell
+SIG_PIN='.....' ./godss keystore -k ../../test_data/auth-cert.key -c ../../test_data/auth-cert.crt ../../test_data/authv2_20260216072211.xml
+```
+
+```shell
+./godss card -d /opt/proCertumSmartSign/libcryptoCertum3PKCS.so -s 0 ../../test_data/authv2_20260216072211.xml
+```
+
+Will ask for PIN, but you can also use `SIG_PIN` env variable.
 
 ## Generating test sign certyficate
 
@@ -96,3 +86,7 @@ Significant portions of codebase have been modified or rewritten to better fit t
 ## Other implementations
 
 - https://github.com/digitalautonomy/goxades_sri/
+
+## Tools    
+
+- https://tools.chilkat.io/
