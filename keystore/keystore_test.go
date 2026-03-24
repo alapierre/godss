@@ -55,6 +55,10 @@ func TestX509SignerInterface(t *testing.T) {
 	privateKeyPath := "../test_data/private_key.pem"
 	certificatePath := "../test_data/certificate.pem"
 
+	if _, err := os.Stat(privateKeyPath); os.IsNotExist(err) {
+		t.Skipf("Pomijanie testu: brak pliku %s", privateKeyPath)
+	}
+
 	signer, err := NewX509KeyStoreSigner(privateKeyPath, certificatePath)
 
 	if err != nil {
