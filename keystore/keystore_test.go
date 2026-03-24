@@ -7,12 +7,20 @@ import (
 	"crypto/sha256"
 	"encoding/base64"
 	"fmt"
+	"os"
 	"testing"
 )
 
 func TestX509KeyStoreSigner(t *testing.T) {
 
-	signer, err := NewX509KeyStoreSigner("../test_data/private_key.pem", "../test_data/certificate.pem")
+	privateKeyPath := "../test_data/private_key.pem"
+	certificatePath := "../test_data/certificate.pem"
+
+	if _, err := os.Stat(privateKeyPath); os.IsNotExist(err) {
+		t.Skipf("Pomijanie testu: brak pliku %s", privateKeyPath)
+	}
+
+	signer, err := NewX509KeyStoreSigner(privateKeyPath, certificatePath)
 
 	if err != nil {
 		t.Error(err)
@@ -44,7 +52,10 @@ func TestX509KeyStoreSigner(t *testing.T) {
 
 func TestX509SignerInterface(t *testing.T) {
 
-	signer, err := NewX509KeyStoreSigner("../test_data/private_key.pem", "../test_data/certificate.pem")
+	privateKeyPath := "../test_data/private_key.pem"
+	certificatePath := "../test_data/certificate.pem"
+
+	signer, err := NewX509KeyStoreSigner(privateKeyPath, certificatePath)
 
 	if err != nil {
 		t.Error(err)

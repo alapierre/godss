@@ -31,6 +31,14 @@ func WithPrivateKeyPassword(password string) X509KeyStoreOption {
 }
 
 func NewX509KeyStoreSigner(privateKeyPath string, certificatePath string, opts ...X509KeyStoreOption) (signer.Signer, error) {
+
+	if _, err := os.Stat(privateKeyPath); err != nil {
+		return nil, fmt.Errorf("private key file %q not available: %w", privateKeyPath, err)
+	}
+	if _, err := os.Stat(certificatePath); err != nil {
+		return nil, fmt.Errorf("certificate file %q not available: %w", certificatePath, err)
+	}
+
 	cfg := x509KeyStoreOptions{}
 	for _, opt := range opts {
 		if opt != nil {
