@@ -8,7 +8,7 @@ require (
 	github.com/akamensky/argparse v1.4.0
 	github.com/beevik/etree v1.6.0
 	github.com/miekg/pkcs11 v1.1.2
-	github.com/russellhaering/goxmldsig v1.5.0
+	github.com/russellhaering/goxmldsig v1.6.0
 	github.com/youmark/pkcs8 v0.0.0-20240726163527-a2c0da244d78
 	golang.org/x/term v0.41.0
 )
