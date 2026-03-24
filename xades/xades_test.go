@@ -15,7 +15,14 @@ import (
 
 func TestKeyStoreSign(t *testing.T) {
 
-	signer, err := keystore.NewX509KeyStoreSigner("../test_data/private_key.pem", "../test_data/certificate.pem")
+	privateKeyPath := "../test_data/private_key.pem"
+	certificatePath := "../test_data/certificate.pem"
+
+	if _, err := os.Stat(privateKeyPath); os.IsNotExist(err) {
+		t.Skipf("Pomijanie testu: brak pliku %s", privateKeyPath)
+	}
+
+	signer, err := keystore.NewX509KeyStoreSigner(privateKeyPath, certificatePath)
 
 	if err != nil {
 		t.Error(err)
