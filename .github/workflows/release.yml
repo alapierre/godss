@@ -28,7 +28,7 @@ jobs:
           VERSION=${GITHUB_REF_NAME#v}
           LDFLAGS="-w -s -X github.com/alapierre/godss/version.Version=${VERSION}"
           cd cmd/godss
-          CGO_ENABLED=0 go build -trimpath -ldflags="$LDFLAGS" -o ../../dist/godss .
+          go build -trimpath -ldflags="$LDFLAGS" -o ../../dist/godss .
 
       - name: Create GitHub Release
         uses: softprops/action-gh-release@a06a81a03ee405af7f2048a818ed3f03bbf83c7b # 2.5.0
