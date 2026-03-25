@@ -2,7 +2,9 @@
 First comprehensive solution in Go for creating XAdES-compliant XML signatures using PKCS#11 tokens or keystores. This library enables seamless signing of XML documents, supporting cryptographic devices for secure digital signatures.
 
 [![GoDoc](https://godoc.org/github.com/alapierre/godss?status.svg)](https://godoc.org/github.com/alapierre/godss)
-[![Sonarcloud Status](https://sonarcloud.io/api/project_badges/measure?project=alapierre_godss&metric=alert_status)](https://sonarcloud.io/dashboard?id=alapierre_godss)
+[![Go Report Card](https://goreportcard.com/badge/github.com/alapierre/godss)](https://goreportcard.com/report/github.com/alapierre/godss)
+[![Go Reference](https://pkg.go.dev/badge/github.com/alapierre/godss.svg)](https://pkg.go.dev/github.com/alapierre/godss)
+
 [![Build Status](https://github.com/alapierre/godss/actions/workflows/go.yml/badge.svg?branch=main)](https://github.com/alapierre/godss/actions/workflows/go.yml)
 
 ## Usage
