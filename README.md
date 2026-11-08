@@ -4,7 +4,6 @@ First comprehensive solution in Go for creating XAdES-compliant XML signatures u
 [![GoDoc](https://godoc.org/github.com/alapierre/godss?status.svg)](https://godoc.org/github.com/alapierre/godss)
 [![Go Report Card](https://goreportcard.com/badge/github.com/alapierre/godss)](https://goreportcard.com/report/github.com/alapierre/godss)
 [![Go Reference](https://pkg.go.dev/badge/github.com/alapierre/godss.svg)](https://pkg.go.dev/github.com/alapierre/godss)
-
 [![Build Status](https://github.com/alapierre/godss/actions/workflows/go.yml/badge.svg?branch=main)](https://github.com/alapierre/godss/actions/workflows/go.yml)
 
 ## Usage
